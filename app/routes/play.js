@@ -6,6 +6,10 @@ default Ember.Route.extend({
 	key: '7ea5f490261a949e52930517e1b4657c',
 	url: 'https://api.themoviedb.org/3/',
 
+	/*
+	 * Model = liste des films les plus populaire
+	 * une page = 20 films
+	 * */
 	model: function() {
 		return Ember.$.getJSON(this.url + 'movie/popular?api_key=' + this.key + '&callback=?')
 			.then(function(movie) {
