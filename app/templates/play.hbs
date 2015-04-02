@@ -1,0 +1,10 @@
+<!--Initial State-->
+<div {{bind-attr class="init_game:hidden" }}>
+  <button class="btn btn-primary btn-lg" {{action "onPlay"}}>PLAY</button>
+</div>
+<!--On game state-->
+<div {{bind-attr class=":col-md-12 init_game::hidden" }}>
+	début du jeu!
+</div>
+
+{{outlet}}
