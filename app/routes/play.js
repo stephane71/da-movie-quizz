@@ -6,6 +6,17 @@ default Ember.Route.extend({
 	key: '7ea5f490261a949e52930517e1b4657c',
 	url: 'https://api.themoviedb.org/3/',
 
+	setupController: function(controller, model) {
+		var rand = [],
+			l = model.length;
+		for (var i = 0; i < l * 10; i++) {
+			rand.push(Math.random() >= 0.5);
+		}
+		// rand_tab => liste de réponses Vrai/Faux
+		controller.rand_tab = rand;
+		controller.set('model', model);
+	},
+
 	/*
 	 * Model = liste des films les plus populaire
 	 * une page = 20 films
