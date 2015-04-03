@@ -23,22 +23,22 @@ default Ember.Controller.extend({
 
 		// ? Charger uniquement les 2 premiers film avec leur casting 
 		// pour gagner du temps de chargement?
-		
+
 		var l = movie.map(function(m) {
 			return self.getCastPromise(m.id);
 		});
 		Ember.RSVP.all(l).then(function(casts) {
 			console.log(casts);
 			self.set('casts', casts);
-			//self.get('tuple');
+			self.set('current_index', 0);
 		});
 	}.observes('model'),
 
-	current_index: 0,
+	/* current_index: 0,*/
 
-	current_answer_type: function() {
-		return this.rand_tab[this.current_index];
-	}.property('current_index'),
+	//current_answer_type: function() {
+	//return this.rand_tab[this.current_index];
+	/*}.property('current_index'),*/
 
 	/*
 	 * Init: création d'un tableau aléatoire de réponses V/F
@@ -46,28 +46,27 @@ default Ember.Controller.extend({
 	 * 1/ sélectionner le type de réponse dans le tableau V/F
 	 * 2/ Choix d'un ID film aléatoire && choix d'un ID acteur aléatoire
 	 * 3/ 	Si rep Vrai
-	 * 			=> Sélectionner le film et l'acteur à partir des 2 IDs précédent 
+	 * 			=> Sélectionner le film et l'acteur à partir des 2 IDs précédent
 	 * 		Si rep Fausse
-	 * 			=> Sélectionner l'acteur à partir des 2 IDs précédent 
+	 * 			=> Sélectionner l'acteur à partir des 2 IDs précédent
 	 * 			=> Sélectionner un autre film aléatoire
 	 * */
 	tuple: function() {
 		if (!this.get('casts')) {
 			return;
 		}
-		var tuple;
-		var rand_movie_id = Math.floor(Math.random() * (this.get('model').length));
-		var rand_actor_id = Math.floor(Math.random() * this.NB_ACTORS + 1);
+		var tuple,
+			rand_movie_id = Math.floor(Math.random() * (this.get('model').length)),
+			rand_actor_id = Math.floor(Math.random() * this.NB_ACTORS);
 
-		if (this.get('current_answer_type')) {
+		if (this.rand_tab[this.current_index]) {
 			tuple = this.getCorrectTuple(rand_movie_id, rand_actor_id);
 		} else {
 			tuple = this.getCorrectTuple(rand_movie_id, rand_actor_id);
 			//tuple = self.getWrongTuple(rand_movie_id, rand_actor_id);
 		}
 		return tuple;
-	}.property('casts'),
-	//}.property('current_answer_type'),
+	}.property('current_index'),
 
 	getCorrectTuple: function(m_id, a_id) {
 		var movie = this.get('model')[m_id];
@@ -105,6 +104,10 @@ default Ember.Controller.extend({
 	actions: {
 		onPlay: function() {
 			this.set('init_game', true);
+		},
+
+		onSelection: function() {
+			this.incrementProperty('current_index');
 		}
 	}
 });
