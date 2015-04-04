@@ -14,12 +14,14 @@ default Ember.View.extend({
 		Ember.$('#div_img').html('');
 		Ember.$('#div_img').append(tuple.movie);
 		Ember.$('#div_img').append(tuple.actor);
+		Ember.$('#div_img > img').addClass('img-thumbnail-noautosize');
+		Ember.$('#div_img > img').last().addClass('pull-right');
 	},
 
 	getTupleImages: function(tuple) {
-		var movie_img = new Image();
+		var movie_img = new Image(342, 513);
 		movie_img.src = tuple.movie;
-		var actor_img = new Image();
+		var actor_img = new Image(342, 513);
 		actor_img.src = tuple.actor;
 		return {
 			movie: movie_img,

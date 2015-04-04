@@ -25,8 +25,8 @@ default Ember.Controller.extend({
 	 * */
 	tuple: function() {
 		var tuple,
-			rand_movie_id = this.getRandomMovieID(this.previous_movie_id),
-			rand_actor_id = this.getRandomActorID();
+			rand_movie_id = this.getRandomID(this.NB_MOVIES, this.previous_movie_id),
+			rand_actor_id = this.getRandomID(this.NB_ACTORS);
 
 		// TODO: list des couples passés pour éviter les répétitions
 		// ne pas avoir deux fois le même film à la suite
@@ -50,14 +50,14 @@ default Ember.Controller.extend({
 
 	getWrongTuple: function(m_id, a_id) {
 		// Le 2ème film choisi doit être différent du 1er 
-		var new_movie_id = this.getRandomMovieID(m_id),
+		var new_movie_id = this.getRandomID(this.NB_MOVIES, m_id),
 			movie = this.getMovie(m_id),
 			new_movie = this.getMovie(new_movie_id),
 			actor = new_movie.cast[a_id];
 
 		// Dans le cas ou l'acteur est présent dans les 2 films
 		if (movie.cast.findBy('id', actor.id)) {
-			a_id = this.getRandomActorID(a_id);
+			a_id = this.getRandomID(this.NB_ACTORS, a_id);
 			actor = new_movie.cast[a_id];
 		}
 		return {
@@ -77,20 +77,10 @@ default Ember.Controller.extend({
 		return this.get('model')[id_movie];
 	},
 
-	getRandomMovieID: function(forbidden_id) {
-		var n = Math.floor(Math.random() * this.NB_MOVIES);
-		//var n = Math.floor(Math.random() * (this.get('model').length));
+	getRandomID: function(N, forbidden_id) {
+		var n = Math.floor(Math.random() * N);
 		while (n === forbidden_id) {
-			n = Math.floor(Math.random() * this.NB_MOVIES);
-			//n = Math.floor(Math.random() * (this.get('model').length));
-		}
-		return n;
-	},
-
-	getRandomActorID: function(forbidden_id) {
-		var n = Math.floor(Math.random() * this.NB_ACTORS);
-		while (n === forbidden_id) {
-			n = Math.floor(Math.random() * this.NB_ACTORS);
+			n = Math.floor(Math.random() * N);
 		}
 		return n;
 	},
@@ -102,7 +92,7 @@ default Ember.Controller.extend({
 
 		onSelection: function(bool) {
 			// Reaload le model après 15 clicks
-			if (this.get('current_index') > 15) {
+			if (this.get('current_index') > this.NB_MOVIES) {
 				this.send('refreshModel');
 				this.set('current_index', 0);
 				return;

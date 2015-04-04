@@ -1,16 +1,14 @@
 <!--Initial State-->
-<div {{bind-attr class="init_game:hidden" }}>
+<div {{bind-attr class=":text-center init_game:hidden" }}>
   <button class="btn btn-primary btn-lg" {{action "onPlay"}}>PLAY</button>
 </div>
 
 <!--On game State-->
-<div id="div_img" {{bind-attr class=":col-md-12 init_game::hidden" }}>
-</div>
-
-<div {{bind-attr class=":col-md-12 init_game::hidden" }}>
+<div {{bind-attr class=":col-md-12 init_game::hidden"}}>
+  <div id="div_img" class="center-block" style="max-width:800px;"></div>
+  <br>
   <div class="text-center">
     <button class="btn btn-success btn-lg" {{action "onSelection" true}}>OUI</button>
     <button class="btn btn-warning btn-lg" {{action "onSelection" false}}>NON</button>
   </div>
 </div>
-{{outlet}}
