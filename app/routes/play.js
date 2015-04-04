@@ -18,8 +18,9 @@ default Ember.Route.extend({
 		}
 		// rand_tab => liste de réponses Vrai/Faux
 		controller.rand_tab = rand;
-
 		controller.set('NB_ACTORS', this.NB_ACTORS);
+		controller.set('NB_MOVIES', model.length);
+
 		controller.set('model', model);
 	},
 
@@ -29,7 +30,8 @@ default Ember.Route.extend({
 	 * */
 	model: function() {
 		var self = this;
-		return Ember.$.getJSON(this.url + 'movie/popular?api_key=' + this.key + '&page=' + this.page + '&callback=?')
+		return Ember.$.getJSON(this.url + 'movie/popular?api_key=' +
+				this.key + '&page=' + this.page + '&callback=?')
 			.then(function(movie) {
 				// ? Charger uniquement les 5 premiers film avec leur casting 
 				// pour gagner du temps de chargement?
@@ -42,6 +44,8 @@ default Ember.Route.extend({
 							poster_path: m.poster_path,
 							cast: casts[i]
 						};
+					}).filter(function(m) {
+						return m.cast.length >= self.NB_ACTORS;
 					});
 				});
 			});
@@ -71,8 +75,16 @@ default Ember.Route.extend({
 		return Ember.$.getJSON(this.url + 'movie/' + id_movie +
 				'/credits?api_key=' + this.key + '&callback=?')
 			.then(function(data) {
+				return data.cast.filter(function(actor) {
+					// data incomplete
+					if (actor.profile_path === null) {
+						return false;
+					}
+					return true;
+				});
+			}).then(function(data) {
 				// Only the first 5 actors of the movie
-				return data.cast.slice(0, nb_actors).map(function(actor) {
+				return data.slice(0, nb_actors).map(function(actor) {
 					return {
 						name: actor.name,
 						id: actor.id,

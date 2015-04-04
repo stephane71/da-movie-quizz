@@ -30,7 +30,7 @@ default Ember.Controller.extend({
 
 		// TODO: list des couples passés pour éviter les répétitions
 		// ne pas avoir deux fois le même film à la suite
-		this.previous_movie_id = rand_movie_id; 
+		this.previous_movie_id = rand_movie_id;
 		if (this.rand_tab[this.current_index]) {
 			tuple = this.getCorrectTuple(rand_movie_id, rand_actor_id);
 		} else {
@@ -50,16 +50,16 @@ default Ember.Controller.extend({
 
 	getWrongTuple: function(m_id, a_id) {
 		// Le 2ème film choisi doit être différent du 1er 
-		var	new_movie_id = this.getRandomMovieID(m_id),
+		var new_movie_id = this.getRandomMovieID(m_id),
 			movie = this.getMovie(m_id),
-			actor = this.getMovie(new_movie_id).cast[a_id];
+			new_movie = this.getMovie(new_movie_id),
+			actor = new_movie.cast[a_id];
 
 		// Dans le cas ou l'acteur est présent dans les 2 films
 		if (movie.cast.findBy('id', actor.id)) {
 			a_id = this.getRandomActorID(a_id);
-			actor = this.getMovie(new_movie_id).cast[a_id];
+			actor = new_movie.cast[a_id];
 		}
-
 		return {
 			movie: this.url_images + movie.poster_path,
 			actor: this.url_images + actor.profile_path
@@ -78,9 +78,11 @@ default Ember.Controller.extend({
 	},
 
 	getRandomMovieID: function(forbidden_id) {
-		var n = Math.floor(Math.random() * (this.get('model').length));
+		var n = Math.floor(Math.random() * this.NB_MOVIES);
+		//var n = Math.floor(Math.random() * (this.get('model').length));
 		while (n === forbidden_id) {
-			n = Math.floor(Math.random() * (this.get('model').length));
+			n = Math.floor(Math.random() * this.NB_MOVIES);
+			//n = Math.floor(Math.random() * (this.get('model').length));
 		}
 		return n;
 	},
@@ -105,6 +107,14 @@ default Ember.Controller.extend({
 				this.set('current_index', 0);
 				return;
 			}
+
+			/*         console.log(this.rand_tab[this.current_index]);*/
+
+			//var res = this.rand_tab[this.current_index-1];
+			//if (bool !== res) {
+			//Ember.Logger.log('Game Over');
+			//return;
+			/*}*/
 			this.incrementProperty('current_index');
 		}
 	}
