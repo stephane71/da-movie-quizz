@@ -3,42 +3,11 @@ import Ember from 'ember';
 export
 default Ember.Controller.extend({
 	/* Revoir gestion de l'API */
-	key: '7ea5f490261a949e52930517e1b4657c',
-	url: 'https://api.themoviedb.org/3/',
 	url_images: 'http://image.tmdb.org/t/p/w342/',
 
-	// Choix du nombre d'acteurs / film
-	NB_ACTORS: 5,
-
-	current: function() {
-		var movie = this.get('model')[0];
-		return {
-			movie: this.url_images + movie.backdrop_path
-		};
-	}.property('model'),
-
 	onMoviesListLoaded: function() {
-		var self = this,
-			movie = this.get('model');
-
-		// ? Charger uniquement les 2 premiers film avec leur casting 
-		// pour gagner du temps de chargement?
-
-		var l = movie.map(function(m) {
-			return self.getCastPromise(m.id);
-		});
-		Ember.RSVP.all(l).then(function(casts) {
-			console.log(casts);
-			self.set('casts', casts);
-			self.set('current_index', 0);
-		});
+		this.set('current_index', 0);
 	}.observes('model'),
-
-	/* current_index: 0,*/
-
-	//current_answer_type: function() {
-	//return this.rand_tab[this.current_index];
-	/*}.property('current_index'),*/
 
 	/*
 	 * Init: création d'un tableau aléatoire de réponses V/F
@@ -52,9 +21,6 @@ default Ember.Controller.extend({
 	 * 			=> Sélectionner un autre film aléatoire
 	 * */
 	tuple: function() {
-		if (!this.get('casts')) {
-			return;
-		}
 		var tuple,
 			rand_movie_id = Math.floor(Math.random() * (this.get('model').length)),
 			rand_actor_id = Math.floor(Math.random() * this.NB_ACTORS);
@@ -62,43 +28,44 @@ default Ember.Controller.extend({
 		if (this.rand_tab[this.current_index]) {
 			tuple = this.getCorrectTuple(rand_movie_id, rand_actor_id);
 		} else {
-			tuple = this.getCorrectTuple(rand_movie_id, rand_actor_id);
-			//tuple = self.getWrongTuple(rand_movie_id, rand_actor_id);
+			tuple = this.getWrongTuple(rand_movie_id, rand_actor_id);
 		}
 		return tuple;
 	}.property('current_index'),
 
 	getCorrectTuple: function(m_id, a_id) {
-		var movie = this.get('model')[m_id];
-		var actor = this.get('casts')[m_id][a_id];
+		var movie = this.getMovie(m_id);
+		var actor = movie.cast[a_id];
 		return {
-			movie: this.url_images + movie.backdrop_path,
+			movie: this.url_images + movie.poster_path,
 			actor: this.url_images + actor.profile_path
 		};
 	},
 
 	getWrongTuple: function(m_id, a_id) {
-
+		var new_movie_id = m_id;
+		while (new_movie_id === m_id) {
+			new_movie_id = Math.floor(Math.random() * (this.get('model').length));
+		}
+		//var new_movie = this.get('model')[new_movie_id];
+		//var actor = this.get('casts')[m_id][a_id];
+		var new_movie = this.getMovie(new_movie_id),
+			actor = this.getMovie(m_id).cast[a_id];
+		return {
+			movie: this.url_images + new_movie.poster_path,
+			actor: this.url_images + actor.profile_path
+		};
 	},
 
 	/*
-	 * Request the movie's cast
-	 * return Promise and the first 5 actors of the movie
+	 * movie = {
+	 * 	backdrop_path: ...,
+	 * 	poster_path:...,
+	 * 	cast: [{name:..., profile_path...}, ...]
+	 * }
 	 * */
-	getCastPromise: function(id_movie) {
-		var nb_actors = this.NB_ACTORS;
-		return Ember.$.getJSON(this.url + 'movie/' + id_movie +
-				'/credits?api_key=' + this.key + '&callback=?')
-			.then(function(data) {
-				// Only the first 5 actors of the movie
-				return data.cast.slice(0, nb_actors).map(function(actor) {
-					return {
-						name: actor.name,
-						id: actor.id,
-						profile_path: actor.profile_path
-					};
-				});
-			});
+	getMovie: function(id_movie) {
+		return this.get('model')[id_movie];
 	},
 
 	actions: {
