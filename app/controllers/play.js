@@ -25,9 +25,12 @@ default Ember.Controller.extend({
 	 * */
 	tuple: function() {
 		var tuple,
-			rand_movie_id = this.getRandomMovieID(),
+			rand_movie_id = this.getRandomMovieID(this.previous_movie_id),
 			rand_actor_id = this.getRandomActorID();
 
+		// TODO: list des couples passés pour éviter les répétitions
+		// ne pas avoir deux fois le même film à la suite
+		this.previous_movie_id = rand_movie_id; 
 		if (this.rand_tab[this.current_index]) {
 			tuple = this.getCorrectTuple(rand_movie_id, rand_actor_id);
 		} else {
@@ -46,15 +49,19 @@ default Ember.Controller.extend({
 	},
 
 	getWrongTuple: function(m_id, a_id) {
-		var new_movie_id = m_id;
 		// Le 2ème film choisi doit être différent du 1er 
-		while (new_movie_id === m_id) {
-			new_movie_id = this.getRandomMovieID();
-		}
-		var new_movie = this.getMovie(m_id),
+		var	new_movie_id = this.getRandomMovieID(m_id),
+			movie = this.getMovie(m_id),
 			actor = this.getMovie(new_movie_id).cast[a_id];
+
+		// Dans le cas ou l'acteur est présent dans les 2 films
+		if (movie.cast.findBy('id', actor.id)) {
+			a_id = this.getRandomActorID(a_id);
+			actor = this.getMovie(new_movie_id).cast[a_id];
+		}
+
 		return {
-			movie: this.url_images + new_movie.poster_path,
+			movie: this.url_images + movie.poster_path,
 			actor: this.url_images + actor.profile_path
 		};
 	},
@@ -70,18 +77,20 @@ default Ember.Controller.extend({
 		return this.get('model')[id_movie];
 	},
 
-	getRandomMovieID: function() {
-		// jamais 2 fois le même film à la suite
+	getRandomMovieID: function(forbidden_id) {
 		var n = Math.floor(Math.random() * (this.get('model').length));
-		while (n === this.current_id_movie) {
+		while (n === forbidden_id) {
 			n = Math.floor(Math.random() * (this.get('model').length));
 		}
-		this.current_id_movie = n;
 		return n;
 	},
 
-	getRandomActorID: function() {
-		return Math.floor(Math.random() * this.NB_ACTORS);
+	getRandomActorID: function(forbidden_id) {
+		var n = Math.floor(Math.random() * this.NB_ACTORS);
+		while (n === forbidden_id) {
+			n = Math.floor(Math.random() * this.NB_ACTORS);
+		}
+		return n;
 	},
 
 	actions: {
