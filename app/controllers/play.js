@@ -6,6 +6,9 @@ default Ember.Controller.extend({
 	url_images: 'http://image.tmdb.org/t/p/w342/',
 
 	onMoviesListLoaded: function() {
+		if (this.get('current_index') > 0) {
+			return;
+		}
 		this.set('current_index', 0);
 	}.observes('model'),
 
@@ -22,8 +25,8 @@ default Ember.Controller.extend({
 	 * */
 	tuple: function() {
 		var tuple,
-			rand_movie_id = Math.floor(Math.random() * (this.get('model').length)),
-			rand_actor_id = Math.floor(Math.random() * this.NB_ACTORS);
+			rand_movie_id = this.getRandomMovieID(),
+			rand_actor_id = this.getRandomActorID();
 
 		if (this.rand_tab[this.current_index]) {
 			tuple = this.getCorrectTuple(rand_movie_id, rand_actor_id);
@@ -44,13 +47,12 @@ default Ember.Controller.extend({
 
 	getWrongTuple: function(m_id, a_id) {
 		var new_movie_id = m_id;
+		// Le 2ème film choisi doit être différent du 1er 
 		while (new_movie_id === m_id) {
-			new_movie_id = Math.floor(Math.random() * (this.get('model').length));
+			new_movie_id = this.getRandomMovieID();
 		}
-		//var new_movie = this.get('model')[new_movie_id];
-		//var actor = this.get('casts')[m_id][a_id];
-		var new_movie = this.getMovie(new_movie_id),
-			actor = this.getMovie(m_id).cast[a_id];
+		var new_movie = this.getMovie(m_id),
+			actor = this.getMovie(new_movie_id).cast[a_id];
 		return {
 			movie: this.url_images + new_movie.poster_path,
 			actor: this.url_images + actor.profile_path
@@ -68,12 +70,32 @@ default Ember.Controller.extend({
 		return this.get('model')[id_movie];
 	},
 
+	getRandomMovieID: function() {
+		// jamais 2 fois le même film à la suite
+		var n = Math.floor(Math.random() * (this.get('model').length));
+		while (n === this.current_id_movie) {
+			n = Math.floor(Math.random() * (this.get('model').length));
+		}
+		this.current_id_movie = n;
+		return n;
+	},
+
+	getRandomActorID: function() {
+		return Math.floor(Math.random() * this.NB_ACTORS);
+	},
+
 	actions: {
 		onPlay: function() {
 			this.set('init_game', true);
 		},
 
-		onSelection: function() {
+		onSelection: function(bool) {
+			// Reaload le model après 15 clicks
+			if (this.get('current_index') > 15) {
+				this.send('refreshModel');
+				this.set('current_index', 0);
+				return;
+			}
 			this.incrementProperty('current_index');
 		}
 	}

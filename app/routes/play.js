@@ -5,9 +5,10 @@ default Ember.Route.extend({
 	/* Revoir gestion de l'API */
 	key: '7ea5f490261a949e52930517e1b4657c',
 	url: 'https://api.themoviedb.org/3/',
-	
+
 	// Choix du nombre d'acteurs / film
 	NB_ACTORS: 5,
+	page: 1,
 
 	setupController: function(controller, model) {
 		var rand = [],
@@ -17,6 +18,7 @@ default Ember.Route.extend({
 		}
 		// rand_tab => liste de réponses Vrai/Faux
 		controller.rand_tab = rand;
+
 		controller.set('NB_ACTORS', this.NB_ACTORS);
 		controller.set('model', model);
 	},
@@ -27,9 +29,9 @@ default Ember.Route.extend({
 	 * */
 	model: function() {
 		var self = this;
-		return Ember.$.getJSON(this.url + 'movie/popular?api_key=' + this.key + '&callback=?')
+		return Ember.$.getJSON(this.url + 'movie/popular?api_key=' + this.key + '&page=' + this.page + '&callback=?')
 			.then(function(movie) {
-				// ? Charger uniquement les 2 premiers film avec leur casting 
+				// ? Charger uniquement les 5 premiers film avec leur casting 
 				// pour gagner du temps de chargement?
 				return movie.results;
 			}).then(function(movie) {
@@ -43,6 +45,13 @@ default Ember.Route.extend({
 					});
 				});
 			});
+	},
+
+	actions: {
+		refreshModel: function() {
+			this.page++;
+			this.refresh();
+		}
 	},
 
 	getMoviesCastPromise: function(movies) {
