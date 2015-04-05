@@ -6,6 +6,7 @@ default Ember.Controller.extend({
 	url_images: 'http://image.tmdb.org/t/p/w342/',
 
 	nb_good_answers: 0,
+		
 	onMoviesListLoaded: function() {
 		this.set('current_index', 0);
 	}.observes('model'),
@@ -82,10 +83,20 @@ default Ember.Controller.extend({
 		}
 		return n;
 	},
+	
+	seconds: 0,
+	triggerTimer: function(){
+		var self = this;
+		this.set('seconds', 0);
+		this.timer_int = setInterval(function(){
+			self.incrementProperty('seconds');
+		}, 1000);
+	},
 
 	actions: {
 		onPlay: function() {
 			this.set('init_game', true);
+			this.triggerTimer();
 		},
 
 		playAgain: function() {
@@ -93,6 +104,7 @@ default Ember.Controller.extend({
 			this.set('game_over', false);
 			this.send('refreshModel');
 			this.set('nb_good_answers', 0);
+			this.triggerTimer();
 		},
 
 		onSelection: function(bool) {
@@ -100,6 +112,7 @@ default Ember.Controller.extend({
 			if (bool !== res) {
 				Ember.Logger.log('Game Over');
 				this.set('game_over', true);
+				clearInterval(this.timer_int);
 				return;
 			}
 			this.incrementProperty('nb_good_answers');
