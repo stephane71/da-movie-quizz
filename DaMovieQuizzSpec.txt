@@ -36,16 +36,22 @@ Highscores
 
 Les routes
 	/play
-		Etat inital => {{partial}} template
-		Jeu en cours => chargement du modèle avec requêtes API (2 films pour commencer)
-	/over
+		Etat inital 
+		Jeu en cours
+		Game Over
 	/highscores
-	
+	+ loading et error	
+
 ------------------------------------------------------------------
 
-v0.1.0
+v0.1
 	route play
 	page avec Etat initial
 	passage Etat initial à Jeu en cours (click "Play")
 	chargement model avec API data
 	selection aléatoire des acteurs et des films
+v0.2
+	timer
+	nombre de bonnes réponses en cours de jeu
+	gestion erreurs si pas de données
+	gestion Game Over
