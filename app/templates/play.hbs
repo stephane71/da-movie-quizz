@@ -3,12 +3,20 @@
   <button class="btn btn-primary btn-lg" {{action "onPlay"}}>PLAY</button>
 </div>
 
-<!--On game State-->
-<div {{bind-attr class=":col-md-12 init_game::hidden"}}>
+<!-- Game State-->
+<div {{bind-attr class=":col-md-12 init_game::hidden game_over:hidden" }}>
+  <h4>{{nb_good_answers}}</h4>
   <div id="div_img" class="center-block" style="max-width:800px;"></div>
   <br>
   <div class="text-center">
     <button class="btn btn-success btn-lg" {{action "onSelection" true}}>OUI</button>
     <button class="btn btn-warning btn-lg" {{action "onSelection" false}}>NON</button>
   </div>
+</div>
+
+<!-- Game Over -->
+<div {{bind-attr class=":text-center :col-md-12 game_over::hidden"}}>
+  <h2>Game Over!!!</h2>
+  <p>Vous avez réalisé {{nb_good_answers}} bonnes réponses!</p>
+  <button class="btn btn-primary btn-lg" {{action "playAgain"}}>PLAY AGAIN!</button>
 </div>

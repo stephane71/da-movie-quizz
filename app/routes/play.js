@@ -58,12 +58,15 @@ default Ember.Route.extend({
 		}
 	},
 
+	/************************************************/
+	/**** Promise for https://www.themoviedb.org ****/
+	/************************************************/
+
 	getMoviesCastPromise: function(movies) {
 		var self = this;
-		var l = movies.map(function(m) {
+		return Ember.RSVP.all(movies.map(function(m) {
 			return self.getOneMovieCastPromise(m.id);
-		});
-		return Ember.RSVP.all(l);
+		}));
 	},
 
 	/*

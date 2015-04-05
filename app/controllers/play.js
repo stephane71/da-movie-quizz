@@ -5,10 +5,8 @@ default Ember.Controller.extend({
 	/* Revoir gestion de l'API */
 	url_images: 'http://image.tmdb.org/t/p/w342/',
 
+	nb_good_answers: 0,
 	onMoviesListLoaded: function() {
-		if (this.get('current_index') > 0) {
-			return;
-		}
 		this.set('current_index', 0);
 	}.observes('model'),
 
@@ -90,21 +88,25 @@ default Ember.Controller.extend({
 			this.set('init_game', true);
 		},
 
+		playAgain: function() {
+			this.set('init_game', true);
+			this.set('game_over', false);
+			this.send('refreshModel');
+			this.set('nb_good_answers', 0);
+		},
+
 		onSelection: function(bool) {
-			// Reaload le model après 15 clicks
-			if (this.get('current_index') > this.NB_MOVIES) {
-				this.send('refreshModel');
-				this.set('current_index', 0);
+			var res = this.rand_tab[this.current_index - 1];
+			if (bool !== res) {
+				Ember.Logger.log('Game Over');
+				this.set('game_over', true);
 				return;
 			}
-
-			/*         console.log(this.rand_tab[this.current_index]);*/
-
-			//var res = this.rand_tab[this.current_index-1];
-			//if (bool !== res) {
-			//Ember.Logger.log('Game Over');
-			//return;
-			/*}*/
+			this.incrementProperty('nb_good_answers');
+			if (this.get('current_index') > this.NB_MOVIES) {
+				this.send('refreshModel');
+				return;
+			}
 			this.incrementProperty('current_index');
 		}
 	}
