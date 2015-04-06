@@ -55,3 +55,5 @@ v0.2
 	nombre de bonnes réponses en cours de jeu
 	gestion erreurs si pas de données
 	gestion Game Over
+V1.0
+	manage highscores
