@@ -1,13 +1,8 @@
 import Ember from 'ember';
+import MovieAPI from '../mixins/movie-api';
 
 export
-default Ember.Route.extend({
-	/* Revoir gestion de l'API */
-	key: '7ea5f490261a949e52930517e1b4657c',
-	url: 'https://api.themoviedb.org/3/',
-
-	// Choix du nombre d'acteurs / film
-	NB_ACTORS: 5,
+default Ember.Route.extend(MovieAPI, {
 	page: 1,
 
 	setupController: function(controller, model) {
@@ -30,25 +25,12 @@ default Ember.Route.extend({
 	 * */
 	model: function() {
 		var self = this;
-		return Ember.$.getJSON(this.url + 'movie/popular?api_key=' +
-				this.key + '&page=' + this.page + '&callback=?')
-			.then(function(movie) {
-				// ? Charger uniquement les 5 premiers film avec leur casting 
-				// pour gagner du temps de chargement?
-				return movie.results;
-			}).then(function(movie) {
-				return self.getMoviesCastPromise(movie).then(function(casts) {
-					return movie.map(function(m, i) {
-						return {
-							backdrop_path: m.backdrop_path,
-							poster_path: m.poster_path,
-							cast: casts[i]
-						};
-					}).filter(function(m) {
-						return m.cast.length >= self.NB_ACTORS;
-					});
-				});
-			});
+		return this.ajax(this.buildURL(null, {
+				page: this.page
+			}))
+			.then(function(data) {
+				return data.results;
+			}).then(self.getMoviesCastPromise.bind(this));
 	},
 
 	actions: {
@@ -56,44 +38,5 @@ default Ember.Route.extend({
 			this.page++;
 			this.refresh();
 		}
-	},
-
-	/************************************************/
-	/**** Promise for https://www.themoviedb.org ****/
-	/************************************************/
-
-	getMoviesCastPromise: function(movies) {
-		var self = this;
-		return Ember.RSVP.all(movies.map(function(m) {
-			return self.getOneMovieCastPromise(m.id);
-		}));
-	},
-
-	/*
-	 * Request the movie's cast
-	 * return Promise and the first 5 actors of the movie
-	 * */
-	getOneMovieCastPromise: function(id_movie) {
-		var nb_actors = this.NB_ACTORS;
-		return Ember.$.getJSON(this.url + 'movie/' + id_movie +
-				'/credits?api_key=' + this.key + '&callback=?')
-			.then(function(data) {
-				return data.cast.filter(function(actor) {
-					// data incomplete
-					if (actor.profile_path === null) {
-						return false;
-					}
-					return true;
-				});
-			}).then(function(data) {
-				// Only the first 5 actors of the movie
-				return data.slice(0, nb_actors).map(function(actor) {
-					return {
-						name: actor.name,
-						id: actor.id,
-						profile_path: actor.profile_path
-					};
-				});
-			});
-	},
+	}
 });
