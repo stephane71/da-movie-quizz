@@ -4,9 +4,21 @@
 </div>
 
 <!-- Game State-->
-<div {{bind-attr class=":col-md-12 init_game::hidden game_over:hidden" }}>
-  <h4>{{nb_good_answers}}</h4>
-  {{game-timer seconds}}
+<div {{bind-attr class=":col-md-12 :col-sm-12 :col-xs-12 init_game::hidden game_over:hidden" }}>
+  <div class="row">
+    <div class="panel panel-default col-md-4 col-sm-4 col-xs-4">
+      <div class="panel-body">
+        <h4>SCORE: {{nb_good_answers}}</h4>
+      </div>
+    </div>
+    <div class="panel panel-default pull-right">
+      <div class="panel-body">
+        <h4><span class="glyphicon glyphicon-time" aria-hidden="true"></span>
+		 {{game-timer seconds}}</h4>
+      </div>
+    </div>
+  </div>
+
   <div id="div_img" class="center-block" style="max-width:800px;"></div>
   <br>
   <div class="text-center">
@@ -16,7 +28,7 @@
 </div>
 
 <!-- Game Over -->
-<div {{bind-attr class=":text-center :col-md-12 game_over::hidden"}}>
+<div {{bind-attr class=":text-center :col-md-12 game_over::hidden" }}>
   <h2>Game Over!!!</h2>
   <p>Vous avez réalisé {{nb_good_answers}} bonnes réponses en {{game-timer seconds}}</p>
   <button class="btn btn-primary btn-lg" {{action "playAgain"}}>PLAY AGAIN!</button>
