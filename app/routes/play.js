@@ -35,8 +35,10 @@ default Ember.Route.extend(MovieAPI, {
 	},
 
 	actions: {
-		refreshModel: function() {
-			this.page++;
+		refreshModel: function(game_over) {
+			if (!game_over) {
+				this.page++;
+			}
 			this.refresh();
 		}
 	}

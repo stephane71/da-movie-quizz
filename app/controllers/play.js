@@ -40,7 +40,7 @@ default Ember.Controller.extend({
 
 	getCorrectTuple: function(m_id, a_id) {
 		var movie = this.getMovie(m_id);
-		var actor = movie.cast[a_id];
+		var actor = this.getActor(movie, a_id);
 		return {
 			movie: this.url_images + movie.poster_path,
 			actor: this.url_images + actor.profile_path
@@ -52,7 +52,7 @@ default Ember.Controller.extend({
 		var new_movie_id = this.getRandomID(this.NB_MOVIES, m_id),
 			movie = this.getMovie(m_id),
 			new_movie = this.getMovie(new_movie_id),
-			actor = new_movie.cast[a_id];
+			actor = this.getActor(new_movie, a_id);
 
 		// Dans le cas ou l'acteur est présent dans les 2 films
 		if (movie.cast.findBy('id', actor.id)) {
@@ -74,6 +74,14 @@ default Ember.Controller.extend({
 	 * */
 	getMovie: function(id_movie) {
 		return this.get('model')[id_movie];
+	},
+
+	getActor: function(movie, id){
+		var actor = movie.cast[id];
+		while(actor === undefined){
+			actor = movie.cast[this.getRandomID(this.NB_ACTORS)];
+		}
+		return actor;
 	},
 
 	getRandomID: function(N, forbidden_id) {
@@ -102,6 +110,8 @@ default Ember.Controller.extend({
 	 * Highscores
 	 * On peu inscrire son score si:
 	 * 		score != 0
+	 * 		le score est > à un highscore
+	 *
 	 * */
 	record_score: function() {
 		var player_score = this.get('nb_good_answers');
@@ -109,13 +119,37 @@ default Ember.Controller.extend({
 			return false;
 		}
 		return true;
+   /*     this.store.find('highscore').then(function(data){*/
+			
+		//});
+		//if(scores.length < this.NB_HIGHSCORES){
+			//return true;
+		//}
+
+		//// Si le scores est > à un Highscore
+		//b = scores.filter(function(e) {
+			//if (player_score > e.get('score')) {
+				//return true;
+			//}
+		//}).length;
+		
+		//if (b) {
+			//var r = scores.sortBy('score').indexAt(0);
+			//r.deleteRecord();
+			//r.destroyRecord();
+			//console.log(r);
+			//return true;
+		//}
+		/*return false;*/
 	}.property('game_over'),
 
 	initGameConditions: function() {
-		this.set('game_over', false);
-		this.set('nb_good_answers', 0);
-		this.set('recorded_flag', false);
-		this.triggerTimer();
+		if (this.get('game_over')) {
+			this.set('game_over', false);
+			this.set('nb_good_answers', 0);
+			this.set('recorded_flag', false);
+			this.triggerTimer();
+		}
 	},
 
 	actions: {
@@ -128,7 +162,7 @@ default Ember.Controller.extend({
 				score: highscore,
 				time: this.seconds
 			});
-			s.save().then();
+			s.save();
 
 			this.set('recorded_flag', true);
 		},
@@ -140,8 +174,7 @@ default Ember.Controller.extend({
 
 		playAgain: function() {
 			this.set('init_game', true);
-			this.send('refreshModel');
-			this.initGameConditions();
+			this.send('refreshModel', true);
 		},
 
 		onSelection: function(bool) {
