@@ -1,20 +1,21 @@
 <h1>Hightscores</h1>
-    <table class="table table-striped table-bordered table-hover">
-      <thead>
-        <tr>
-          <td>Nom</td>
-          <td>Score</td>
-          <td>Temps</td>
-        </tr>
-      </thead>
-      <tbody>
-        {{#each item in model}}
-        <tr>
-          <td>{{item.name}}</td>
-          <td>{{item.score}}</td>
-          <td>{{game-timer item.time}}</td>
-        </tr>
-        {{/each}}
-      </tbody>
-    </table>
+<table class="table table-striped table-bordered table-hover">
+  <thead>
+    <tr>
+      <td>Nom</td>
+      <td>Score</td>
+      <td>Temps</td>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each item in model}}
+    <tr>
+      <td>{{item.name}}</td>
+      <td>{{item.score}}</td>
+      <td>{{game-timer item.time}}</td>
+    </tr>
+    {{/each}}
+  </tbody>
+</table>
 
+<button class="btn btn-primary btn-lg" {{action "resetHighscores"}}>Supprimer tous les records</button>
