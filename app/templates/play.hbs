@@ -30,6 +30,41 @@
 <!-- Game Over -->
 <div {{bind-attr class=":text-center :col-md-12 game_over::hidden" }}>
   <h2>Game Over!!!</h2>
-  <p>Vous avez réalisé {{nb_good_answers}} bonnes réponses en {{game-timer seconds}}</p>
+  <h3>Vous avez réalisé {{nb_good_answers}} bonnes réponses en {{game-timer seconds}}</h3>
+
+  <br>
+  <br>
+  <br>
+
+  <!--Enregistrer son score dans les highscores-->
+  <div {{bind-attr class=":row record_score::hidden recorded_flag:hidden" }}>
+    <div class="panel panel-default row">
+      <div class="panel-body">
+        <h3>Enregistrez votre score!</h3> 
+        <form class="form-inline">
+          <div class="form-group">
+            <label for="player_name">Votre nom</label>
+            <input type="text" class="form-control" id="player_name" placeholder="Votre nom">
+          </div>
+          <button {{action "saveHighscore"}} class="btn btn-default">Enregistrez</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!--Confirmation de l'enregistrement-->
+  <div {{bind-attr class=":row recorded_flag::hidden" }}>
+    <div {{bind-attr class=":row :alert :alert-success" }} role="alert">
+      Tu entres dans l'histoire... !
+    </div>
+  </div>
+
+  <br>
+  <br>
+  <br>
+
   <button class="btn btn-primary btn-lg" {{action "playAgain"}}>PLAY AGAIN!</button>
+  <div>
+    {{#link-to "highscores"}}voir les meilleurs scores{{/link-to}}
+  </div>
 </div>

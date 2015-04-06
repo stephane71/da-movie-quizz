@@ -8,4 +8,5 @@ var Router = Ember.Router.extend({
 export default Router.map(function() {
   this.route('play');
   this.route('loading');
+  this.route('highscores');
 });

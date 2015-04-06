@@ -6,7 +6,7 @@ default Ember.Controller.extend({
 	url_images: 'http://image.tmdb.org/t/p/w342/',
 
 	nb_good_answers: 0,
-		
+
 	onMoviesListLoaded: function() {
 		this.set('current_index', 0);
 	}.observes('model'),
@@ -83,17 +83,56 @@ default Ember.Controller.extend({
 		}
 		return n;
 	},
-	
+
+	/*
+	 * Timer
+	 * */
 	seconds: 0,
-	triggerTimer: function(){
+	triggerTimer: function() {
 		var self = this;
 		this.set('seconds', 0);
-		this.timer_int = setInterval(function(){
+		clearInterval(this.timer_int);
+		this.timer_int = setInterval(function() {
 			self.incrementProperty('seconds');
 		}, 1000);
 	},
 
+	NB_HIGHSCORES: 3,
+	/*
+	 * Highscores
+	 * On peu inscrire son score si:
+	 * 		score != 0
+	 * */
+	record_score: function() {
+		var player_score = this.get('nb_good_answers');
+		if (!player_score) {
+			return false;
+		}
+		return true;
+	}.property('game_over'),
+
+	initGameConditions: function() {
+		this.set('game_over', false);
+		this.set('nb_good_answers', 0);
+		this.set('recorded_flag', false);
+		this.triggerTimer();
+	},
+
 	actions: {
+		saveHighscore: function() {
+			var highscore = this.get('nb_good_answers'),
+				player_name = Ember.$('#player_name').val();
+
+			var s = this.store.createRecord('highscore', {
+				name: player_name,
+				score: highscore,
+				time: this.seconds
+			});
+			s.save().then();
+
+			this.set('recorded_flag', true);
+		},
+
 		onPlay: function() {
 			this.set('init_game', true);
 			this.triggerTimer();
@@ -101,10 +140,8 @@ default Ember.Controller.extend({
 
 		playAgain: function() {
 			this.set('init_game', true);
-			this.set('game_over', false);
 			this.send('refreshModel');
-			this.set('nb_good_answers', 0);
-			this.triggerTimer();
+			this.initGameConditions();
 		},
 
 		onSelection: function(bool) {

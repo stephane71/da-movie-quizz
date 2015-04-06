@@ -16,6 +16,7 @@ default Ember.Route.extend(MovieAPI, {
 		controller.set('NB_ACTORS', this.NB_ACTORS);
 		controller.set('NB_MOVIES', model.length);
 
+		controller.initGameConditions();
 		controller.set('model', model);
 	},
 
