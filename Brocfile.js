@@ -9,6 +9,7 @@ app.import('bower_components/bootstrap/dist/fonts/glyphicons-halflings-regular.w
 app.import('bower_components/bootstrap/dist/fonts/glyphicons-halflings-regular.woff', {destDir: 'fonts'});
 app.import('bower_components/bootstrap/dist/fonts/glyphicons-halflings-regular.ttf', {destDir: 'fonts'});
 
+app.import('bower_components/ember-localstorage-adapter/localstorage_adapter.js');
 // Use `app.import` to add additional libraries to the generated
 // output files.
 //
