@@ -26,12 +26,12 @@ default Ember.Route.extend(MovieAPI, {
 	 * */
 	model: function() {
 		var self = this;
-		return this.ajax(this.buildURL(null, {
+		return this.get('movie-service').ajax(this.buildURL(null, {
 				page: this.page
 			}))
 			.then(function(data) {
 				return data.results;
-			}).then(self.getMoviesCastPromise.bind(this));
+			}).then(self.get('movie-service').getMoviesCastPromise.bind(this));
 	},
 
 	actions: {
