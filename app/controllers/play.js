@@ -76,9 +76,9 @@ default Ember.Controller.extend({
 		return this.get('model')[id_movie];
 	},
 
-	getActor: function(movie, id){
+	getActor: function(movie, id) {
 		var actor = movie.cast[id];
-		while(actor === undefined){
+		while (actor === undefined) {
 			actor = movie.cast[this.getRandomID(this.NB_ACTORS)];
 		}
 		return actor;
@@ -105,7 +105,7 @@ default Ember.Controller.extend({
 		}, 1000);
 	},
 
-	NB_HIGHSCORES: 3,
+	NB_HIGHSCORES: 10,
 	/*
 	 * Highscores
 	 * On peu inscrire son score si:
@@ -113,35 +113,39 @@ default Ember.Controller.extend({
 	 * 		le score est > à un highscore
 	 *
 	 * */
-	record_score: function() {
-		var player_score = this.get('nb_good_answers');
-		if (!player_score) {
-			return false;
-		}
-		return true;
-   /*     this.store.find('highscore').then(function(data){*/
-			
-		//});
-		//if(scores.length < this.NB_HIGHSCORES){
-			//return true;
-		//}
 
-		//// Si le scores est > à un Highscore
-		//b = scores.filter(function(e) {
-			//if (player_score > e.get('score')) {
-				//return true;
-			//}
-		//}).length;
-		
-		//if (b) {
-			//var r = scores.sortBy('score').indexAt(0);
-			//r.deleteRecord();
-			//r.destroyRecord();
-			//console.log(r);
-			//return true;
-		//}
-		/*return false;*/
-	}.property('game_over'),
+	showRecordForm: function() {
+		var self = this,
+			score = this.get('nb_good_answers');
+
+		// Si le score est null => pas d'enregistrement
+		if (!score) {
+			this.set('record_score', false);
+			return;
+		}
+		this.store.find('highscore').then(function(data) {
+			var show = false;
+
+			//Il reste de la place dans les highscores
+			if (data.toArray().length < self.NB_HIGHSCORES) {
+				show = true;
+			}
+			//Est ce que le score est > à un highscore?
+			else {
+				var del = data.filter(function(e) {
+					if (score <= e.get('score')) {
+						return false;
+					}
+					return true;
+				});
+				// Si au moins un highscore < score
+				if (del.toArray().length) {
+					show = true;
+				}
+			}
+			self.set('record_score', show);
+		});
+	}.observes('game_over'),
 
 	initGameConditions: function() {
 		if (this.get('game_over')) {
@@ -152,9 +156,18 @@ default Ember.Controller.extend({
 		}
 	},
 
+	fixNbHighscores: function() {
+		var hs = this.store.all('highscore');
+		if (hs.get('length') > this.NB_HIGHSCORES) {
+			var del = hs.sortBy('score').get('firstObject');
+			del.destroyRecord();
+		}
+	},
+
 	actions: {
 		saveHighscore: function() {
-			var highscore = this.get('nb_good_answers'),
+			var self = this,
+				highscore = this.get('nb_good_answers'),
 				player_name = Ember.$('#player_name').val();
 
 			var s = this.store.createRecord('highscore', {
@@ -162,9 +175,10 @@ default Ember.Controller.extend({
 				score: highscore,
 				time: this.seconds
 			});
-			s.save();
-
-			this.set('recorded_flag', true);
+			s.save().then(function() {
+				self.set('recorded_flag', true);
+				self.fixNbHighscores();
+			});
 		},
 
 		onPlay: function() {
