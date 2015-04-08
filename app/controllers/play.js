@@ -3,7 +3,7 @@ import Ember from 'ember';
 export
 default Ember.Controller.extend({
 	/* Revoir gestion de l'API */
-	url_images: 'http://image.tmdb.org/t/p/w342/',
+	url_images: 'http://image.tmdb.org/t/p/w342',
 
 	nb_good_answers: 0,
 
