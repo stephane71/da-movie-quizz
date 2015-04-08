@@ -1,6 +1,7 @@
 import Ember from 'ember';
 
-export default Ember.Service.extend({
+export
+default Ember.Service.extend({
 	key: 'afc3d90d2d302e68e3f870ad29c66634',
 	url: 'https://api.themoviedb.org/3/',
 
@@ -26,7 +27,6 @@ export default Ember.Service.extend({
 				url: url,
 				type: 'GET',
 				dataType: "jsonp",
-				//context: self,
 
 				// This handler is not called for cross-domain script and cross-domain JSONP requests.
 				// http://api.jquery.com/jquery.ajax/
@@ -41,10 +41,10 @@ export default Ember.Service.extend({
 		});
 	},
 
-	getMoviesCastPromise: function(movies) {
+	getMoviesCastPromises: function(movies) {
 		var self = this;
 		return Ember.RSVP.all(movies.map(function(m) {
-			return self.getOneMovieCastPromise(m.id).then(function(cast) {
+			return self.getOneMovieCastPromises(m.id).then(function(cast) {
 				return {
 					backdrop_path: m.backdrop_path,
 					poster_path: m.poster_path,
@@ -58,9 +58,11 @@ export default Ember.Service.extend({
 	 * Request the movie's cast
 	 * return Promise and the first 5 actors of the movie
 	 * */
-	getOneMovieCastPromise: function(id_movie) {
+	getOneMovieCastPromises: function(id_movie) {
 		var nb_actors = this.NB_ACTORS;
-		return this.ajax(this.buildURL('cast', {id_movie: id_movie}))
+		return this.ajax(this.buildURL('cast', {
+				id_movie: id_movie
+			}))
 			.then(function(data) {
 				return data.cast.filter(function(actor) {
 					// data incomplete

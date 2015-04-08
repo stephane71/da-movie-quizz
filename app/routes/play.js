@@ -1,8 +1,7 @@
 import Ember from 'ember';
-import MovieAPI from '../mixins/movie-api';
 
 export
-default Ember.Route.extend(MovieAPI, {
+default Ember.Route.extend({
 	page: 1,
 
 	setupController: function(controller, model) {
@@ -13,7 +12,7 @@ default Ember.Route.extend(MovieAPI, {
 		}
 		// rand_tab => liste de réponses Vrai/Faux
 		controller.rand_tab = rand;
-		controller.set('NB_ACTORS', this.NB_ACTORS);
+		controller.set('NB_ACTORS', this.get('movie-service').NB_ACTORS);
 		controller.set('NB_MOVIES', model.length);
 
 		controller.initGameConditions();
@@ -25,13 +24,16 @@ default Ember.Route.extend(MovieAPI, {
 	 * une page = 20 films
 	 * */
 	model: function() {
-		var self = this;
-		return this.get('movie-service').ajax(this.buildURL(null, {
+		var movie_service = this.get('movie-service'),
+			url = movie_service.buildURL(null, {
 				page: this.page
-			}))
+			});
+
+		return movie_service.ajax(url)
 			.then(function(data) {
 				return data.results;
-			}).then(self.get('movie-service').getMoviesCastPromise.bind(this));
+			})
+			.then(movie_service.getMoviesCastPromises.bind(movie_service));
 	},
 
 	actions: {
