@@ -8,9 +8,7 @@ default Ember.Route.extend({
 	},
 
 	model: function() {
-		return this.store.find('highscore').then(function(data) {
-			return data.sortBy('score').reverse();
-		});
+		return this.store.find('highscore');
 	},
 
 	actions: {
