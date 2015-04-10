@@ -4,9 +4,9 @@ module.exports = function(environment) {
 	var ENV = {
 		contentSecurityPolicy: {
 			'default-src': "'none'",
-			'script-src': "'self' 'unsafe-eval' https://api.themoviedb.org",
+			'script-src': "'self' 'unsafe-eval' https://api.themoviedb.org https://apisandbox.snapcar.com/public/",
 			'font-src': "'self'",
-			'connect-src': "'self'",
+			'connect-src': "'self' https://apisandbox.snapcar.com/public/",
 			'img-src': "'self' http://image.tmdb.org",
 			'style-src': "'self' 'unsafe-inline'",
 			'media-src': "'self'"

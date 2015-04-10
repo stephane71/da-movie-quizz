@@ -9,4 +9,6 @@ export default Router.map(function() {
   this.route('play');
   this.route('loading');
   this.route('highscores');
+  this.route('reservation');
+  this.route('history');
 });
